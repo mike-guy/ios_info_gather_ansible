@@ -1,0 +1,13 @@
+[core_switches]
+c9k-spine ansible_host=198.18.1.21 
+
+[access_switches]
+c9k-leaf1 ansible_host=198.18.1.31
+c9k-leaf2 ansible_host=198.18.1.32
+
+[all_switches:children]
+core_switches
+access_switches
+    
+[all_switches:vars]
+ansible_network_os=cisco.ios.ios

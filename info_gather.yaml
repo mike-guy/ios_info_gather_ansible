@@ -1,0 +1,38 @@
+---
+- name: Generate timestamp 
+  hosts: localhost 
+  tasks:
+    - name: Set timestamp fact 
+      ansible.builtin.set_fact:
+        timestamp: "{{ ansible_date_time.year }}{{ ansible_date_time.month }}{{ ansible_date_time.day }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}"
+        
+- name: Gather core switch info 
+  hosts: all # You could obviously target specific hosts such as core_switches or access_switches
+  connection: ansible.netcommon.network_cli
+  gather_facts: false 
+  vars_files:
+    - commands.yaml
+  vars:
+    timestamp: "{{ hostvars['localhost'].timestamp }}"
+  tasks:
+    - name: Run core switch show commands 
+      cisco.ios.ios_command:
+        commands: "{{ item }}" 
+      register: command_output
+      loop: "{{ commands }}"
+
+    - name: Create host directory 
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/show_command_outputs/{{ timestamp }}/{{ inventory_hostname }}"
+        state: directory 
+      delegate_to: localhost
+
+    - name: Save outputs to file 
+      ansible.builtin.copy:
+        content: "{{ command_output.results[index].stdout[0] | replace('\\n', '\n') }}"
+        dest: "{{ playbook_dir }}/show_command_outputs/{{ timestamp }}/{{ inventory_hostname }}/{{ item | replace(' ', '_') }}.txt"
+      loop: "{{ commands }}" 
+      loop_control:
+        index_var: index 
+      delegate_to: localhost
+...
