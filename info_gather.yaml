@@ -15,7 +15,7 @@
   vars:
     timestamp: "{{ hostvars['localhost'].timestamp }}"
   tasks:
-    - name: Run core switch show commands 
+    - name: Run ios commands 
       cisco.ios.ios_command:
         commands: "{{ item }}" 
       register: command_output
