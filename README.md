@@ -15,10 +15,6 @@ This is a simple example of using Ansible to gather show commands from your Cisc
      ```
      source venv/bin/activate
      ```
-   - On Windows:
-     ```
-     .\venv\Scripts\activate
-     ```
 
 3. Install Ansible
    ```
